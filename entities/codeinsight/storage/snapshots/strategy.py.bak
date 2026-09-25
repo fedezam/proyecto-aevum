@@ -1,0 +1,92 @@
+The provided Python code defines a `CodeInsightStrategy` class that is responsible for various operations on a codebase, such as auditing, translating comments and text to English, renaming files, updating references, refactoring, and generating reports. The class follows a set of guidelines (GLI, GLR, GL30-O, GLP, GLC, GLM) which seem to be related to code analysis and transformation principles.
+
+Below is the full content of the file with the translation of non-English comments and strings to English, while preserving the code behavior and identifiers as per the `GLC` axiom.
+
+```python
+import json, re, os, shutil, unicodedata
+from pathlib import Path
+from typing import Dict, List
+
+SKIP_DIRS = {".git", "node_modules", "__pycache__", "storage", "reports", ".venv", "env", "venv"}
+
+def iter_files(root: Path, exts=(".py",".json",".md")):
+    for p in root.rglob("*"):
+        if p.is_dir() and p.name in SKIP_DIRS:
+            continue
+        if p.is_file() and p.suffix.lower() in exts:
+            yield p
+
+def slugify_en(s: str) -> str:
+    s = unicodedata.normalize("NFKD", s).encode("ascii","ignore").decode("ascii")
+    s = re.sub(r"[^\w.\-]+", "_", s)
+    s = re.sub(r"__+", "_", s).strip("_")
+    return s
+
+BASIC_ES_EN = {
+    "inicio":"start","principal":"main","auditor":"auditor","estrategia":"strategy",
+    "entidad":"entity","plan":"plan","capacidad":"capability","memoria":"memory",
+    "reporte":"report","utilidades":"utils","pruebas":"tests","documentacion":"docs"
+}
+
+class CodeInsightStrategy:
+    def __init__(self, base: Path, llm, seed: str, ghost: Dict, caps: Dict, memory: Dict):
+        self.base, self.llm, self.seed = base, llm, seed
+        self.ghost, self.caps, self.memory = ghost, caps, memory
+        self.target_root = Path(json.loads((self.base/"plan.json").read_text(encoding="utf-8"))["TARGET_ROOT"]).resolve()
+
+    # ====== Helpers ======
+    def _messages(self, user_content: str) -> List[Dict]:
+        return [
+            {"role":"system","content": self.seed},
+            {"role":"system","content": f"[GLI] AXIOMS: " + " | ".join(self.ghost.get("AXIOMS",[]))},
+            {"role":"user","content": user_content}
+        ]
+
+    def _snapshot_if_enabled(self, p: Path):
+        cfg = self.caps["capability_config"]["file_snapshots"]
+        if cfg.get("auto_backup", True):
+            snap_dir = (self.base / cfg.get("dir","storage/snapshots"))
+            snap_dir.mkdir(parents=True, exist_ok=True)
+            dst = snap_dir / f"{p.name}.bak"
+            shutil.copy(p, dst)
+
+    def _verify_syntax(self, p: Path) -> bool:
+        if p.suffix == ".py":
+            try:
+                compile(p.read_text(encoding="utf-8"), str(p), "exec")
+                return True
+            except Exception:
+                return False
+        if p.suffix == ".json":
+            try:
+                json.loads(p.read_text(encoding="utf-8"))
+                return True
+            except Exception:
+                return False
+        return True
+
+    # ====== Tasks ======
+    def audit(self):
+        results = []
+        for f in iter_files(self.target_root):
+            code = f.read_text(encoding="utf-8", errors="ignore")
+            prompt = f"""[GL30-O] Observe and audit this file.
+- Identify syntax/style issues, risks, missing tests, and inconsistent names.
+- Explain reasoning with [GLR] and alternatives with [GLP].
+- Suggest minimal diffs; do NOT rewrite yet.
+FILE: {f}
+CONTENT:
+```
+{code}
+```"""
+            feedback = self.llm.chat(self._messages(prompt))
+            results.append({"file": str(f), "feedback": feedback})
+        self.memory.setdefault("past_reports", []).append({"audit": results})
+
+    def translate_to_english(self):
+        for f in iter_files(self.target_root, exts=(".py",".md")):
+            txt = f.read_text(encoding="utf-8", errors="ignore")
+            prompt = f"""[GLC] Translate comments/docstrings/text to **English** while preserving code behavior and identifiers.
+Keep gliphs and code blocks intact. Return full file content only.
+FILE: {f}"""
+            new_txt = self.llm.chat(self._messages(prompt + "\n

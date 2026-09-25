@@ -1,0 +1,22 @@
+{
+  "required_capabilities": [
+    "file_snapshots",
+    "progress_tracking",
+    "state_persistence",
+    "syntax_verification",
+    "translation",
+    "glifo_telemetry",
+    "auto_apply",
+    "report_generation"
+  ],
+  "capability_config": {
+    "file_snapshots": { "auto_backup": true, "dir": "storage/snapshots", "retention_days": 30 },
+    "progress_tracking": { "show_percentage": true },
+    "state_persistence": { "memory_file": "memory.json" },
+    "translation": { "from": "es", "to": "en", "rename_files": true },
+    "auto_apply": { "enabled": true },
+    "report_generation": { "format": "md", "dir": "reports" },
+    "glifo_telemetry": { "prefix_logs": true }
+  }
+}
+

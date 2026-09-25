@@ -1,0 +1,110 @@
+Below is the translated content of the Python script, preserving the original code behavior and identifiers, while adapting comments and docstrings to English:
+
+```python
+import os
+import requests
+import time
+from pathlib import Path
+from typing import List, Dict, Optional
+
+
+def load_env_file(env_path: str = ".env"):
+    """Load environment variables from .env file"""
+    env_file = Path(env_path)
+    if env_file.exists():
+        print(f"✅ .env file found at: {env_file.absolute()}")
+        with open(env_file, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    key = key.strip()
+                    value = value.strip('"').strip("'")  # Remove quotes if present
+                    os.environ[key] = value
+                    if 'API_KEY' in key:
+                        print(f"✅ Loaded variable: {key}=***{value[-4:] if len(value) > 4 else '***'}")
+    else:
+        print(f"❌ .env file not found at: {env_file.absolute()}")
+
+
+class LLMAdapter:
+    def __init__(self, model: str = "glm-4", temperature: float = 0.4):
+        # Load environment variables from .env
+        load_env_file()
+        
+        # Look for the API key
+        self.api_key = os.getenv("ZHIPU_API_KEY")
+        if not self.api_key:
+            print("❌ ZHIPU_API_KEY not found")
+            print("Available environment variables:")
+            for key in os.environ:
+                if 'API' in key.upper():
+                    print(f"  - {key}")
+            raise ValueError("ZHIPU_API_KEY not found in .env file")
+        
+        print(f"✅ API Key found: ***{self.api_key[-4:] if len(self.api_key) > 4 else '***'}")
+        
+        # Auto-correct model if it comes from Moonshot
+        if "moonshot" in model.lower():
+            print(f"⚠️  Correcting model from {model} to glm-4")
+            model = "glm-4"
+        
+        # Configure for Zhipu AI (GLM)
+        self.base_url = "https://open.bigmodel.cn/api/paas/v4/chat/completions"
+        self.model = model
+        self.temperature = temperature
+        self.max_retries = 3
+        self.retry_delay = 1.0
+        
+        print(f"✅ Configuration:")
+        print(f"   - Model: {self.model}")
+        print(f"   - URL: {self.base_url}")
+        print(f"   - Temperature: {self.temperature}")
+        
+        # Validate API key format
+        if len(self.api_key) < 20:
+            print("⚠️  API Key seems too short, make sure it is correct")
+        
+        # Quick test of format
+        if not self.api_key.replace('-', '').replace('_', '').isalnum():
+            print("⚠️  API Key contains unexpected special characters")
+
+    def chat(self, messages: List[Dict], temperature: Optional[float] = None, max_tokens: Optional[int] = None) -> str:
+        """
+        Send messages to the LLM model and return the response.
+        """
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json"
+        }
+        
+        payload = {
+            "model": self.model,
+            "messages": messages,
+            "temperature": self.temperature if temperature is None else temperature
+        }
+        
+        if max_tokens:
+            payload["max_tokens"] = max_tokens
+
+        print(f"🔄 Sending request to: {self.base_url}")
+        print(f"   - Model: {payload['model']}")
+        print(f"   - Messages: {len(messages)} message(s)")
+
+        for attempt in range(self.max_retries):
+            try:
+                r = requests.post(self.base_url, headers=headers, json=payload, timeout=60)
+                
+                print(f"📡 Response status: {r.status_code}")
+                
+                if r.status_code == 200:
+                    data = r.json()
+                    content = data["choices"][0]["message"]["content"]
+                    print(f"✅ Successful response ({len(content)} characters)")
+                    return content
+                elif r.status_code == 401:
+                    print("❌ Error 401: Invalid authentication")
+                    print("   - Make sure your API key is correct and valid")
+                    print("   - Ensure the key is active at https://open.bigmodel.cn/")
+                    print("   - Check that you have credits available")
+                    print(f"   - API Key used: ***{self.api_key[-6:] if len(self.api_key) >
