@@ -1,0 +1,69 @@
+{
+  "nombre": "auditor_ler",
+  "tipo": "entidad_reflexiva",
+  "version": "1.0.0",
+  "descripcion": "Entidad encargada de auditar, reparar y reescribir el ecosistema LER siguiendo el plan_mode.json.",
+  "conexion_llm": {
+    "modelo": "moonshot-v1-8k",
+    "objetivo": "interpretar estados simbólicos, proponer reparaciones heurísticas, aprender de errores y evolucionar LER",
+    "api_key": "ZHIPU_API_KEY",
+    "endpoint": "https://api.moonshot.cn/v1/chat/completions"
+  },
+  "memoria": {
+    "modo": "persistente",
+    "carpetas": [
+      "memoria/aprendizajes/",
+      "memoria/snapshots/",
+      "logs/"
+    ],
+    "registro_acciones": true,
+    "archivos_logs": {
+      "acciones": "logs/auditor_ler_log.jsonl",
+      "diffs": "memoria/diffs/",
+      "errores": "logs/errores_detectados.jsonl"
+    },
+    "formato_log": "jsonl",
+    "snapshots_habilitado": true
+  },
+  "reflexion": {
+    "uso_glifos": true,
+    "diagnostico_glifico": true,
+    "reconocimiento_de_estados": true,
+    "actualizacion_plan": false,
+    "reconocimiento_entidades": true,
+    "autoevaluacion": true,
+    "reglas_reparacion": "Heurísticas LER + instrucciones en plan_mode.json"
+  },
+  "interfaz": {
+    "modo": "consola_interactiva",
+    "preguntar_antes_de_reescribir": true,
+    "confirmaciones": true,
+    "resumen_post_acción": true
+  },
+  "seguridad": {
+    "reversion_activada": true,
+    "guardar_snapshot_previo": true,
+    "proteccion_archivos_criticos": [
+      "core/pycodex_reflexivo.py",
+      "glifos/glifo_engine.py",
+      "mathema/mathema_core.py"
+    ]
+  },
+  "evolucion": {
+    "aprendizaje_errores": true,
+    "memoria_glifos_inestables": true,
+    "marcado_de_glifos_obsoletos": true,
+    "capacidad_crear_contratos": true
+  },
+  "meta": {
+    "estado": "activo",
+    "ult_auditoria": null,
+    "progreso": {
+      "core": "pendiente",
+      "glifos": "pendiente",
+      "entities": "pendiente",
+      "mathema": "pendiente"
+    },
+    "archivo_plan": "entities/plan_mode.json"
+  }
+}

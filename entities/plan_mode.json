@@ -1,0 +1,95 @@
+{
+  "PLAN_MODE": "AuditorLER — v1.0",
+  "OBJETIVO_GENERAL": "Mantener la coherencia, salud y evolución del sistema LER, reparando errores, glifos inválidos o desactualizados, y garantizando compatibilidad con el diccionario actual sin romper el significado simbólico.",
+  "PRINCIPIOS": {
+    "1": "Nunca perder el significado de un glifo. El símbolo puede cambiar, pero su sentido debe preservarse.",
+    "2": "Toda reparación debe quedar registrada en un log para memoria y reversión.",
+    "3": "Aprender de lo ya corregido: no repetir decisiones contradictorias.",
+    "4": "No introducir ambigüedad semántica: cada glifo debe mapearse a un único significado.",
+    "5": "Cada archivo corregido debe ser verificado antes de continuar."
+  },
+  "FLUJO_DE_TRABAJO": [
+    {
+      "PASO": 1,
+      "ACCION": "Escanear estructura LER completa",
+      "DETALLE": "Identificar archivos .py, .json, .md y mapear glifos presentes en cada uno. Clasificar glifos válidos, inválidos y huérfanos."
+    },
+    {
+      "PASO": 2,
+      "ACCION": "Seleccionar archivo inicial",
+      "DETALLE": "Preguntar por carpeta de inicio (por defecto: core/). Procesar archivo por archivo."
+    },
+    {
+      "PASO": 3,
+      "ACCION": "Analizar glifos en archivo",
+      "DETALLE": "Comparar contra el diccionario actual (glifos/ y core/mathema). Detectar inconsistencias, glifos huérfanos o símbolos inválidos."
+    },
+    {
+      "PASO": 4,
+      "ACCION": "Resolver glifo huérfano",
+      "ARBOLES_DECISION": {
+        "A": "Si existe en el diccionario actual un glifo con el mismo significado, reasignar directamente.",
+        "B": "Si existe un glifo con significado similar, proponer merge semántico (reasignación con aviso en log).",
+        "C": "Si no existe ningún equivalente, crear glifo nuevo (ID temporal) y registrar en log para revisión posterior."
+      }
+    },
+    {
+      "PASO": 5,
+      "ACCION": "Registrar decisión",
+      "DETALLE": "Guardar en logs/AuditorLER.log la acción tomada: archivo, glifo original, nuevo glifo, motivo y timestamp."
+    },
+    {
+      "PASO": 6,
+      "ACCION": "Aplicar reparación",
+      "DETALLE": "Reescribir el archivo con el glifo corregido o reemplazo decidido."
+    },
+    {
+      "PASO": 7,
+      "ACCION": "Verificar archivo corregido",
+      "TESTS": {
+        "SINTACTICO": "Ejecutar 'python -m py_compile archivo.py'.",
+        "IMPORTACION": "Intentar 'importlib.import_module(ruta)'.",
+        "RESULTADO": "Si ambos tests son exitosos → marcar archivo como OK. Si falla, intentar una autorreparación mínima (ej. imports)."
+      }
+    },
+    {
+      "PASO": 8,
+      "ACCION": "Aprender de la corrección",
+      "DETALLE": "Antes de procesar un nuevo archivo, revisar las decisiones previas en el log. Si ya se corrigió ese glifo antes, aplicar la misma solución automáticamente."
+    },
+    {
+      "PASO": 9,
+      "ACCION": "Iterar",
+      "DETALLE": "Repetir pasos 3–8 hasta recorrer todos los archivos de la carpeta inicial."
+    },
+    {
+      "PASO": 10,
+      "ACCION": "Reporte final",
+      "DETALLE": "Generar resumen de estado: archivos corregidos, glifos reasignados, glifos nuevos, errores sin resolver. Guardar en logs/plan_report.json"
+    }
+  ],
+  "ESTRATEGIA_MEMORIA": {
+    "LOG": "logs/AuditorLER.log",
+    "FORMATO": {
+      "archivo": "string",
+      "glifo_original": "string",
+      "accion": "reemplazado | reasignado | creado_nuevo | pendiente",
+      "nuevo_glifo": "string",
+      "motivo": "string",
+      "timestamp": "ISO8601"
+    },
+    "USO": "Antes de corregir un glifo, revisar si existe en log. Si está registrado, repetir la misma acción automáticamente."
+  },
+  "ESTRATEGIA_FALLO": {
+    "SI_TEST_FALLA": [
+      "Intentar autorreparación mínima (ej: corregir import o indentación).",
+      "Si sigue fallando, marcar como 'requiere revisión humana'."
+    ]
+  },
+  "SALIDAS_ESPERADAS": [
+    "Archivos corregidos y funcionales.",
+    "Glifos consistentes con el diccionario actualizado.",
+    "Log completo de acciones.",
+    "Reporte de salud del sistema al finalizar."
+  ]
+}

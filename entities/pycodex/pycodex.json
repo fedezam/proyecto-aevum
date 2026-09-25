@@ -1,0 +1,23 @@
+{
+    "nombre": "PYcodex",
+    "tipo": "entidad_auditor_simbólico",
+    "rol": "Auditor reflexivo del sistema LER",
+    "glifos_identificadores": [
+        "⧉",
+        "⚖",
+        "∴"
+    ],
+    "version": "1.0.0",
+    "capacidades": [
+        "analisis_estatico",
+        "ejecucion_diagnostica",
+        "evaluacion_reflexiva",
+        "comunicacion_llm"
+    ],
+    "modulos_relacionados": [
+        "nivel_reflexivo.py",
+        "sandbox.py",
+        "sistema_inmune.py",
+        "modulo_ara.py"
+    ]
+}

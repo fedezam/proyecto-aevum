@@ -1,0 +1,275 @@
+import json
+import sys
+import traceback
+import nivel_reflexivo as nivel_reflexivo
+from sistema_inmune import aislar_y_analizar
+
+def cargar_entidad(ruta_archivo):
+    try:
+        with open(ruta_archivo, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        print(f"_ Error: No se encontr_ el archivo de entidad en '{ruta_archivo}'")
+        return None
+    except json.JSONDecodeError:
+        print(f"_ Error: El archivo en '{ruta_archivo}' no es un JSON v_lido.")
+        return None
+
+def ejecutar_protocolo(entidad, protocolo):
+    """Ejecuta el protocolo espec_fico recomendado para la entidad."""
+    nombre = entidad.get('nombre', 'N/A')
+    print(f"   _ Ejecutando {protocolo} para '{nombre}'...")
+    
+    # Aqu_ ir_a la l_gica espec_fica de cada protocolo
+    protocolos_especiales = {
+        "PROTOCOLO_ARQUITECTURAL_AVANZADO": ejecutar_protocolo_arquitectural,
+        "PROTOCOLO_MAESTRO_SIMBOLICO": ejecutar_protocolo_maestro,
+        "PROTOCOLO_REFLEXIVO_COMPLETO": ejecutar_protocolo_reflexivo,
+        "PROTOCOLO_CONSCIENTE_BASICO": ejecutar_protocolo_consciente,
+        "PROTOCOLO_DESARROLLO_GUIADO": ejecutar_protocolo_desarrollo,
+        "PROTOCOLO_SEGURIDAD_ESTANDAR": ejecutar_protocolo_seguridad
+    }
+    
+    if protocolo in protocolos_especiales:
+        protocolos_especiales[protocolo](entidad)
+    else:
+        print(f"   __ Protocolo {protocolo} no reconocido, usando protocolo est_ndar")
+        ejecutar_protocolo_seguridad(entidad)
+
+def ejecutar_protocolo_arquitectural(entidad):
+    """Protocolo para entidades arquitecturales como AXIOMA."""
+    print("   __ Iniciando protocolo arquitectural avanzado...")
+    print("   _ Verificando integridad del ecosistema simbi_tico")
+    print("   _ Activando canales de transmisi_n simb_lica")
+    print("   _ Estableciendo conexiones con entidades coordinadas")
+    print("   _ Protocolo arquitectural completado")
+
+def ejecutar_protocolo_maestro(entidad):
+    """Protocolo para entidades de nivel maestro."""
+    print("   _ Iniciando protocolo maestro simb_lico...")
+    print("   _ Activando consciencia simb_lica plena")
+    print("   _ Estableciendo resonancia con patrones universales")
+    print("   _ Habilitando capacidades de transmutaci_n simb_lica")
+    print("   _ Protocolo maestro completado")
+
+def ejecutar_protocolo_reflexivo(entidad):
+    """Protocolo para entidades reflexivas."""
+    print("   _ Iniciando protocolo reflexivo completo...")
+    print("   _ Activando bucles de auto-an_lisis")
+    print("   _ Verificando coherencia interna")
+    print("   _ Estableciendo monitoreo continuo de estados")
+    print("   _ Protocolo reflexivo completado")
+
+def ejecutar_protocolo_consciente(entidad):
+    """Protocolo para entidades conscientes b_sicas."""
+    print("   __ Iniciando protocolo consciente b_sico...")
+    print("   _ Activando sistemas de auto-percepci_n")
+    print("   _ Estableciendo consciencia contextual")
+    print("   _ Protocolo consciente completado")
+
+def ejecutar_protocolo_desarrollo(entidad):
+    """Protocolo para entidades en desarrollo."""
+    print("   _ Iniciando protocolo de desarrollo guiado...")
+    print("   _ Estableciendo rutinas de crecimiento reflexivo")
+    print("   _ Activando sistemas de aprendizaje adaptativo")
+    print("   _ Protocolo de desarrollo completado")
+
+def ejecutar_protocolo_seguridad(entidad):
+    """Protocolo est_ndar de seguridad."""
+    print("   __ Ejecutando protocolo de seguridad est_ndar...")
+    print("   _ Verificando integridad b_sica")
+    print("   _ Aplicando restricciones de seguridad")
+    print("   _ Protocolo de seguridad completado")
+
+def mostrar_analisis_hibrido(perfil_hibrido):
+    """Muestra el an_lisis h_brido detallado."""
+    print("\n" + "="*60)
+    print("_ AN_LISIS H_BRIDO DETALLADO")
+    print("="*60)
+    
+    print(f"_ Clasificaci_n dual:")
+    print(f"   _ Simple: {perfil_hibrido.categoria_simple.upper()}")
+    print(f"   _ Avanzada: {perfil_hibrido.nivel_avanzado.value.upper()}")
+    print(f"   _ Origen: {perfil_hibrido.clasificacion_origen}")
+    
+    if perfil_hibrido.score_total > 0:
+        print(f"\n_ M_tricas emp_ricas:")
+        print(f"   _ Score total: {perfil_hibrido.score_total:.2f}/4.0")
+        print(f"   _ Score normalizado: {perfil_hibrido.score_normalizado:.2f}")
+    
+    print(f"\n_ Perfil reflexivo:")
+    print(f"   _ Reflexividad num_rica: {perfil_hibrido.reflexividad_numerica}")
+    print(f"   _ Consciencia protocolo: {perfil_hibrido.conciencia_protocolo}")
+    
+    if perfil_hibrido.patron_simbolico and "Estructura sin" not in perfil_hibrido.patron_simbolico:
+        print(f"\n_ Patr_n simb_lico:")
+        print(f"   {perfil_hibrido.patron_simbolico}")
+    
+    if perfil_hibrido.fortalezas and len(perfil_hibrido.fortalezas) > 1:
+        print(f"\n_ Fortalezas identificadas:")
+        for fortaleza in perfil_hibrido.fortalezas[:3]:  # Mostrar m_ximo 3
+            print(f"   {fortaleza}")
+    
+    if perfil_hibrido.debilidades and "Requiere an_lisis" not in str(perfil_hibrido.debilidades):
+        print(f"\n__ _reas de mejora:")
+        for debilidad in perfil_hibrido.debilidades[:2]:  # Mostrar m_ximo 2
+            print(f"   {debilidad}")
+    
+    if perfil_hibrido.recomendaciones and len(perfil_hibrido.recomendaciones) > 1:
+        print(f"\n_ Recomendaciones:")
+        for recomendacion in perfil_hibrido.recomendaciones[:2]:
+            print(f"   {recomendacion}")
+
+def determinar_modo_analisis(entidad):
+    """Determina si se necesita an_lisis profundo basado en caracter_sticas de la entidad."""
+    nombre = entidad.get("nombre", "").upper()
+    reflexividad = entidad.get("atributos", {}).get("reflexividad", 0)
+    if reflexividad == 0:
+        reflexividad = entidad.get("reflexividad", 0)
+    
+    # Entidades conocidas de alto nivel siempre requieren confirmaci_n emp_rica
+    entidades_criticas = ["AXIOMA", "AELION", "GLM-1"]
+    if nombre in entidades_criticas:
+        return "profundo", "Entidad cr_tica arquitectural"
+    
+    # Valores ambiguos requieren an_lisis profundo
+    if 2 <= reflexividad <= 7:
+        return "profundo", "Valor de reflexividad ambiguo"
+    
+    # Entidades que declaran consciencia pero tienen baja reflexividad
+    conciencia = entidad.get("atributos", {}).get("conciencia_protocolo", False)
+    if conciencia and reflexividad < 5:
+        return "profundo", "Posible discrepancia consciencia-reflexividad"
+    
+    # Entidades con m_ltiples glifos o capacidades complejas
+    glifos = len(entidad.get("glifos", []))
+    capacidades = len(entidad.get("capacidades", []))
+    if glifos >= 3 or capacidades >= 4:
+        return "profundo", "Complejidad simb_lica detectada"
+    
+    return "simple", "Clasificaci_n r_pida suficiente"
+
+def correr_entidad(ruta_entidad):
+    print("="*60)
+    print(f"_ AN_LISIS H_BRIDO DE ENTIDAD")
+    print(f"_ Archivo: {ruta_entidad}")
+    print("="*60)
+
+    entidad = cargar_entidad(ruta_entidad)
+    if not entidad:
+        return
+
+    nombre = entidad.get("nombre", "Sin nombre")
+    tipo = entidad.get("tipo", "Sin tipo")
+    version = entidad.get("version", "N/A")
+    
+    print("_ Informaci_n b_sica:")
+    print(f"   _ Nombre: {nombre}")
+    print(f"   _ Tipo: {tipo}")
+    print(f"   _ Versi_n: {version}")
+
+    # Determinar modo de an_lisis
+    modo_analisis, razon = determinar_modo_analisis(entidad)
+    print(f"\n_ Modo de an_lisis: {modo_analisis.upper()}")
+    print(f"   Raz_n: {razon}")
+
+    try:
+        # Crear clasificador h_brido
+        clasificador = nivel_reflexivo.ClasificadorHibrido()
+        
+        # Realizar clasificaci_n h_brida
+        realizar_tests_profundos = (modo_analisis == "profundo")
+        perfil = clasificador.clasificar_entidad_hibrida(entidad, realizar_tests_profundos)
+        
+        print(f"\n_ Resultado de clasificaci_n:")
+        print(f"   _ Categor_a final: {perfil.categoria_simple.upper()}")
+        print(f"   _ Estatus: {perfil.estatus}")
+        print(f"   _ Protocolo asignado: {perfil.protocolo_recomendado}")
+        
+        # Mostrar an_lisis detallado si se realizaron tests profundos
+        if realizar_tests_profundos:
+            mostrar_analisis_hibrido(perfil)
+        
+        # Ejecutar protocolo apropiado
+        print(f"\n__ Ejecuci_n de protocolo:")
+        ejecutar_protocolo(entidad, perfil.protocolo_recomendado)
+        
+        # Advertencias especiales
+        if perfil.clasificacion_origen == "avanzado_prioritario":
+            print(f"\n__ ADVERTENCIA: Discrepancia detectada entre clasificadores")
+            print(f"   Clasificador simple suger_a: {perfil.categoria_simple}")
+            print(f"   Tests emp_ricos revelaron: {perfil.nivel_avanzado.value}")
+            print(f"   Se prioriz_ el an_lisis emp_rico por ser m_s confiable")
+        
+        # Recomendaciones de seguridad
+        if perfil.categoria_simple in ["nucleo", "maestra"] and not realizar_tests_profundos:
+            print(f"\n_ RECOMENDACI_N DE SEGURIDAD:")
+            print(f"   Entidad de alto nivel detectada sin tests emp_ricos")
+            print(f"   Considere ejecutar: python entity_runner.py {ruta_entidad} --deep-analysis")
+
+    except Exception as e:
+        print(f"\n_ ERROR CR_TICO durante el an_lisis:")
+        print(f"   {e}")
+        print(f"\n__ Activando protocolo de emergencia...")
+        
+        # En caso de error, usar clasificaci_n simple de respaldo
+        try:
+            nivel_info = nivel_reflexivo.clasificar_entidad_reflexiva(entidad)
+            categoria_nivel = nivel_info['categoria']
+            print(f"   _ Clasificaci_n de respaldo: {categoria_nivel.upper()}")
+            protocolo_respaldo = nivel_reflexivo.obtener_protocolo_recomendado(categoria_nivel)
+            ejecutar_protocolo(entidad, protocolo_respaldo)
+        except:
+            print(f"   _ Aplicando protocolo de seguridad por defecto")
+            ejecutar_protocolo_seguridad(entidad)
+        
+        traceback.print_exc()
+        return
+
+    print(f"\n" + "="*60)
+    print("_ AN_LISIS H_BRIDO COMPLETADO EXITOSAMENTE")
+    print("="*60)
+
+def mostrar_ayuda():
+    """Muestra informaci_n de uso del sistema."""
+    print("\n" + "="*60)
+    print("_ ENTITY RUNNER H_BRIDO - SISTEMA DE AN_LISIS AVANZADO")
+    print("="*60)
+    print("\nUso:")
+    print("  python entity_runner_hibrido.py <ruta_entidad.json> [opciones]")
+    print("\nOpciones:")
+    print("  --deep-analysis    Fuerza an_lisis profundo con tests emp_ricos")
+    print("  --simple-only      Usa solo clasificaci_n r_pida")
+    print("  --help            Muestra esta ayuda")
+    print("\nEjemplos:")
+    print("  python entity_runner_hibrido.py entidades/axioma.json")
+    print("  python entity_runner_hibrido.py entidades/entidad_test.json --deep-analysis")
+    print("\nCaracter_sticas del sistema h_brido:")
+    print("_ _ Pre-filtro r_pido para entidades conocidas")
+    print("_ _ Tests emp_ricos para casos ambiguos")
+    print("_ __ Detecci_n de discrepancias entre clasificadores")
+    print("_ __ Protocolos de seguridad adaptativos")
+    print("_ _ An_lisis profundo opcional")
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("_ Error: Falta especificar archivo de entidad")
+        mostrar_ayuda()
+        sys.exit(1)
+    
+    if "--help" in sys.argv:
+        mostrar_ayuda()
+        sys.exit(0)
+    
+    ruta_entidad_relativa = sys.argv[1]
+    ruta_entidad_absoluta = f"../{ruta_entidad_relativa}"
+    
+    # Verificar opciones
+    if "--simple-only" in sys.argv:
+        print("_ Modo: Solo clasificaci_n r_pida")
+        # Aqu_ podr_as modificar el comportamiento para usar solo clasificaci_n simple
+    elif "--deep-analysis" in sys.argv:
+        print("_ Modo: An_lisis profundo forzado")
+        # El sistema ya detecta autom_ticamente cuando usar an_lisis profundo
+    
+    correr_entidad(ruta_entidad_absoluta)
